@@ -10,7 +10,7 @@ Spécifications : [`docs/`](docs) — [Produit](docs/PRODUCT.md) · [Architectur
 
 | Fonctionnalité | État | Détail |
 |---|---|---|
-| Schéma de base complet (27 tables), RLS, migrations | ✅ Vérifié | Appliqué sur Postgres 16 + pgvector ; 30+ assertions d'isolation et d'intégrité (`npm run test:db`) |
+| Schéma de base complet (30 tables), RLS, migrations | ✅ Vérifié | Appliqué sur Postgres 16 + pgvector ; 30+ assertions d'isolation et d'intégrité (`npm run test:db`) |
 | Design system (thème émeraude, mode sombre, marqueurs de fiabilité) | ✅ Vérifié | Revu en capture clair/sombre, desktop/mobile |
 | Shell applicatif, navigation latérale, responsive | ✅ Vérifié | |
 | Validation des formulaires d'authentification, protection des routes, redirections sûres | ✅ Vérifié | Tests E2E Playwright (desktop + mobile) |
