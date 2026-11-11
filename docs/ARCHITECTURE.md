@@ -79,7 +79,9 @@ interface LlmProvider {
 - **Isolation des contenus non fiables** : le texte du CV et de l'offre est encapsulé dans des balises délimitées et traité comme donnée, jamais comme instruction (cf. `SECURITY.md`).
 - **Traçabilité** : chaque champ extrait porte `evidence` (extrait source) et `confidence` (`verified` | `inferred` | `unknown`).
 - **Compteur d'usage** : table `ai_usage` (tokens, coût estimé, fonctionnalité) pour quotas et administration.
-- **Fournisseur par défaut** : configurable via `AI_PROVIDER` ; un `MockProvider` explicitement marqué sert aux tests.
+- **Fournisseur par défaut** : Anthropic (`src/server/ai/provider.ts`), Messages API avec `output_config.format` (JSON Schema dérivé du schéma Zod, mots-clés non pris en charge retirés puis revérifiés par Zod). Les tests utilisent des réponses simulées explicitement nommées.
+- **Ancrage** (`src/server/cv/grounding.ts`) : après validation, tout élément dont l'extrait n'apparaît pas tel quel dans le document source est rejeté et compté.
+- **Repli** : sans clé ou en cas d'échec (délai, refus, sortie invalide), l'analyseur déterministe prend le relais.
 
 ## 5. Score de couverture CV/offre (déterministe)
 

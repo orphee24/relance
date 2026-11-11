@@ -7,7 +7,7 @@ test.describe("Accès et protection des routes", () => {
     await expect(page.getByText("Hypothèse").first()).toBeVisible();
   });
 
-  for (const path of ["/tableau-de-bord", "/candidatures", "/parametres", "/reseau"]) {
+  for (const path of ["/tableau-de-bord", "/candidatures", "/parametres", "/reseau", "/onboarding", "/cv", "/cv/00000000-0000-0000-0000-000000000000/verifier"]) {
     test(`${path} redirige un visiteur vers la connexion`, async ({ page }) => {
       await page.goto(path);
       await expect(page).toHaveURL(new RegExp(`/connexion\\?next=${encodeURIComponent(path).replace(/%2F/g, "(%2F|/)")}`));
@@ -15,10 +15,12 @@ test.describe("Accès et protection des routes", () => {
     });
   }
 
-  test("l'export de données refuse un visiteur", async ({ request }) => {
-    const res = await request.get("/api/compte/export", { maxRedirects: 0 });
-    expect([302, 307, 401]).toContain(res.status());
-  });
+  for (const url of ["/api/compte/export", "/api/cv/versions/00000000-0000-0000-0000-000000000000/pdf", "/api/cv/00000000-0000-0000-0000-000000000000/original"]) {
+    test(`${url} refuse un visiteur`, async ({ request }) => {
+      const res = await request.get(url, { maxRedirects: 0 });
+      expect([302, 307, 401]).toContain(res.status());
+    });
+  }
 
   test("les en-têtes de sécurité sont présents", async ({ request }) => {
     const res = await request.get("/");

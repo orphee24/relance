@@ -7,12 +7,12 @@
 | Accès aux données d'un autre utilisateur | RLS sur toutes les tables personnelles ; `user_id = auth.uid()` ; autorisation revérifiée côté serveur |
 | Vol de session | Cookies httpOnly gérés par `@supabase/ssr`, rafraîchissement via middleware, `getUser()` (vérifié par le serveur Auth) et jamais `getSession()` pour autoriser |
 | Injection SQL | Client Supabase paramétré ; aucune concaténation SQL ; fonctions SQL `security definer` limitées avec `search_path` fixé |
-| Prompt injection via CV/offre | Contenu encapsulé et déclaré non fiable ; sorties strictement validées par Zod ; le LLM n'a accès à aucun outil ni donnée d'un autre utilisateur ; aucun effet de bord déclenché directement par une sortie LLM |
+| Prompt injection via CV/offre | Lignes ressemblant à des consignes retirées avant envoi et signalées à l'utilisateur (`safety.ts`) ; contenu encapsulé et déclaré non fiable ; sortie contrainte par schéma puis validée par Zod ; ancrage : tout élément absent du document est rejeté ; aucun outil fourni au modèle ; aucun effet de bord déclenché par une sortie LLM |
 | Abus du module réseau | Quotas, pas d'énumération, « Ne plus contacter », journal d'audit |
 | Webhooks falsifiés | Vérification de signature Stripe (`constructEvent`) sur le corps brut ; idempotence par `event.id` |
 | Fuite de secrets | Secrets uniquement en variables d'environnement ; `SUPABASE_SERVICE_ROLE_KEY` utilisée seulement dans `src/server` (`server-only`) ; `.env*` ignorés par git |
 | Brute force / spam | Rate limiting Supabase Auth + limiteur applicatif sur routes sensibles (IA, réseau, auth) |
-| Upload malveillant | Types limités (PDF, DOCX), taille ≤ 5 Mo, bucket privé, chemin `user_id/…`, URLs signées courtes |
+| Upload malveillant | Type déterminé par signature du fichier (jamais par l'extension ou le type déclaré), PDF/DOCX uniquement, ≤ 5 Mo, 10 imports/24 h et 20 CV max par compte, bucket privé, chemin `user_id/…`, URLs signées de 60 s |
 | XSS | Rendu React échappé ; aucun `dangerouslySetInnerHTML` sur contenu utilisateur ; en-têtes CSP |
 
 ## 2. En-têtes HTTP

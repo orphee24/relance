@@ -21,13 +21,27 @@ Légende : ✅ fait et vérifié · 🟡 partiel / simulé · ⬜ à faire
 - Forfaits payants = paiements uniques de 30 jours (`is_recurring = false`), conformément à la spécification.
 
 ## Phase 2 — Onboarding, profils, CV
-- ⬜ Onboarding en étapes avec progression
-- ⬜ Upload CV (Storage privé), extraction texte PDF/DOCX
-- ⬜ Extraction IA structurée + écran de vérification utilisateur
-- ⬜ Versions de CV, export PDF
+- ✅ Onboarding en 5 étapes avec progression ; seuls l'identité et le métier sont obligatoires ; reprise depuis le tableau de bord
+- ✅ Extraction de texte PDF/DOCX (type détecté par signature, 5 Mo max, scans signalés) — testée sur fichiers réels générés
+- ✅ Analyseur de CV déterministe (sans IA) : identité, expériences, dates, réalisations, formation, compétences, langues
+- ✅ Ancrage : tout élément sans extrait exact dans le CV est rejeté (IA comme analyseur)
+- ✅ Protection anti-injection : lignes ressemblant à des consignes pour une IA retirées et signalées
+- ✅ Détection des informations manquantes (contact, dates, réalisations chiffrées…)
+- 🟡 Extraction par IA (Anthropic, sorties JSON contraintes par schéma) : adaptateur testé avec réponses simulées, **jamais appelé réellement** (pas de clé)
+- ✅ Écran de vérification : chaque information est modifiable, retirable ; compétences acceptées/refusées une par une
+- ✅ Validation atomique (fonction SQL) : nouvelle version + compétences vérifiées — testée en SQL
+- ✅ Versions multiples, CV principal, suppression avec confirmation
+- ✅ Export PDF de chaque version — vérifié par relecture du PDF produit
+- 🟡 Upload vers le stockage privé, téléchargement de l'original par URL signée (60 s) : code complet, **non testé contre un vrai projet Supabase**
+- ✅ Tests : 72 unitaires, 34 E2E, 2 suites SQL
+
+### Limites connues
+- L'analyseur déterministe lit bien les CV à une colonne ; les mises en page en colonnes ou en tableaux peuvent mélanger les sections. L'extraction IA et l'écran de vérification compensent.
+- Les CV scannés (images) ne sont pas lus : pas d'OCR pour l'instant.
+- Traitement synchrone dans la requête (quelques secondes) ; passage en tâche asynchrone si les temps de réponse IA l'exigent.
 
 ## Phase 3 — Offres et analyses IA
-- ⬜ Couche fournisseur LLM + MockProvider
+- ✅ Couche fournisseur LLM (livrée en phase 2)
 - ⬜ Extraction des critères d'offre
 - ⬜ Score de couverture explicable (moteur déterministe déjà écrit en phase 1 : `src/server/analysis/coverage.ts`)
 - ⬜ Suggestions de modification acceptables / refusables une par une

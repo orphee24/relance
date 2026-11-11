@@ -6,7 +6,7 @@ Copilote de recherche d'emploi : analyse CV/offre, CRM de candidatures et **Netw
 
 Spécifications : [`docs/`](docs) — [Produit](docs/PRODUCT.md) · [Architecture](docs/ARCHITECTURE.md) · [Base de données](docs/DATABASE.md) · [Moteur réseau](docs/NETWORK_ENGINE.md) · [Sécurité & RGPD](docs/SECURITY.md) · [Roadmap](docs/ROADMAP.md)
 
-## État actuel — fin de la phase 1
+## État actuel — fin de la phase 2
 
 | Fonctionnalité | État | Détail |
 |---|---|---|
@@ -20,9 +20,17 @@ Spécifications : [`docs/`](docs) — [Produit](docs/PRODUCT.md) · [Architectur
 | Export RGPD (JSON) | 🟡 Code complet | Fonction SQL testée ; route non testée contre Supabase réel |
 | Demande de suppression de compte | 🟡 Enregistrée | **Le traitement automatique (job) est prévu en phase 8** ; d'ici là, traitement manuel par l'opérateur |
 | Moteurs déterministes : couverture CV/offre, pertinence des contacts, métriques | ✅ Testés unitairement | Seront branchés en phases 3, 5 et 6 |
-| Autres écrans (candidatures, analyse, réseau, CV…) | ⬜ | Affichent clairement « en construction » avec leur contenu prévu |
+| Onboarding en 5 étapes | 🟡 Code complet | Validation testée ; enregistrement non testé contre Supabase réel |
+| Import CV PDF/DOCX, extraction, analyse sans IA, ancrage, anti-injection, PDF | ✅ Testés | Sur fichiers générés (`tests/fixtures`, données fictives) |
+| Extraction des CV par IA | 🟡 Adaptateur testé avec réponses simulées | Activé par `ANTHROPIC_API_KEY` ; jamais appelé réellement |
+| Vérification du profil, versions, CV principal, export PDF | 🟡 Logique SQL et rendu PDF testés | Parcours complet non testé contre Supabase réel |
+| Autres écrans (candidatures, analyse, réseau…) | ⬜ | Affichent clairement « en construction » avec leur contenu prévu |
 
 Reporté après le MVP : coach d'entretien vocal, découverte intégrée de contacts (fournisseurs sous contrat), Relance Campus, Relance Employer.
+
+## IA
+
+Sans `ANTHROPIC_API_KEY`, Relance fonctionne avec son analyseur déterministe. Avec une clé, l'extraction passe par le modèle configuré (`AI_MODEL`) en sortie JSON contrainte par schéma ; le résultat est ensuite ancré dans le texte du CV, puis vérifié par l'utilisateur. Renseigner `AI_PRICE_*` d'après la grille tarifaire en vigueur pour l'estimation des coûts.
 
 ## Prérequis
 
@@ -48,7 +56,7 @@ Sans configuration Supabase, l'application démarre et les pages protégées red
    - Site URL : `NEXT_PUBLIC_SITE_URL`
    - Redirect URLs : `<site>/auth/confirm`, `<site>/auth/callback`
 4. **Modèles d'email** (`Authentication > Email Templates`), pour un flux compatible rendu serveur :
-   - *Confirm signup* : `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email&next=/tableau-de-bord`
+   - *Confirm signup* : `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email&next=/onboarding`
    - *Reset password* : `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery&next=/reinitialiser-mot-de-passe`
    - Traduire les textes en français.
 5. **Sécurité Auth** — activer « Confirm email », la protection contre les mots de passe compromis, et ajuster les rate limits (`Authentication > Rate Limits`). Configurer un SMTP (Resend) avant la mise en production : le SMTP par défaut de Supabase est limité.
@@ -63,7 +71,7 @@ Sans configuration Supabase, l'application démarre et les pages protégées red
 | `npm run typecheck` | TypeScript strict |
 | `npm run lint` | ESLint |
 | `npm test` | Tests unitaires (Vitest) |
-| `npm run test:db` | Migrations + tests RLS sur un Postgres jetable (binaires Postgres 15+ et pgvector requis) |
+| `npm run test:db` | Migrations + suites SQL (RLS, workflow CV), une base jetable par suite (Postgres 15+ et pgvector requis) |
 | `npm run test:e2e` | Build de production + Playwright (`CHROME_PATH=/chemin/vers/chrome` si les navigateurs Playwright ne sont pas installés) |
 | `npm run check` | typecheck + lint + tests + build |
 

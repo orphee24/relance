@@ -9,7 +9,11 @@ trap '$RUNAS "$PGBIN/pg_ctl" -D "$DATA" -m immediate stop >/dev/null 2>&1 || tru
 $RUNAS "$PGBIN/initdb" -D "$DATA" -A trust -U postgres -E UTF8 --no-locale >/dev/null
 $RUNAS "$PGBIN/pg_ctl" -D "$DATA" -o "-p $PORT -k $DATA" -l "$DATA/log" start >/dev/null || { cat "$DATA/log"; exit 1; }
 PSQL=(psql -h "$DATA" -p "$PORT" -U postgres -v ON_ERROR_STOP=1 -q -X)
-"${PSQL[@]}" -c "create database relance_test" >/dev/null
-"${PSQL[@]}" -d relance_test -f supabase/tests/local_supabase_stub.sql
-for f in supabase/migrations/*.sql; do echo "→ $f"; "${PSQL[@]}" -d relance_test -f "$f"; done
-"${PSQL[@]}" -d relance_test -f supabase/tests/rls_isolation_test.sql
+for t in supabase/tests/*_test.sql; do
+  db="t_$(basename "$t" .sql)"
+  echo "→ $t"
+  "${PSQL[@]}" -c "create database $db" >/dev/null
+  "${PSQL[@]}" -d "$db" -f supabase/tests/local_supabase_stub.sql
+  for f in supabase/migrations/*.sql; do "${PSQL[@]}" -d "$db" -f "$f"; done
+  "${PSQL[@]}" -d "$db" -f "$t"
+done

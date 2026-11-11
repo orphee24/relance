@@ -33,6 +33,10 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  // CV jusqu'à 5 Mo envoyés par Server Action
+  experimental: { serverActions: { bodySizeLimit: "6mb" } },
+  // Bibliothèques de lecture PDF/DOCX chargées côté serveur sans bundling
+  serverExternalPackages: ["unpdf", "mammoth"],
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },

@@ -53,7 +53,7 @@ export async function signUp(_prev: FormState, formData: FormData): Promise<Form
     email,
     password,
     options: {
-      emailRedirectTo: `${await siteUrl()}/auth/confirm?next=/tableau-de-bord`,
+      emailRedirectTo: `${await siteUrl()}/auth/confirm?next=/onboarding`,
       data: {
         first_name: firstName,
         last_name: lastName,
@@ -66,7 +66,7 @@ export async function signUp(_prev: FormState, formData: FormData): Promise<Form
   if (error) return { status: "error", message: mapAuthError(error.code, error.status), values };
 
   // Confirmation d'email désactivée côté projet : session immédiate.
-  if (data.session) redirect("/tableau-de-bord");
+  if (data.session) redirect("/onboarding");
 
   // Réponse identique que l'adresse existe ou non (anti-énumération).
   redirect(`/verifier-email?email=${encodeURIComponent(email)}`);
@@ -138,7 +138,7 @@ export async function resendVerification(_prev: FormState, formData: FormData): 
   const { error } = await supabase.auth.resend({
     type: "signup",
     email: parsed.data.email,
-    options: { emailRedirectTo: `${await siteUrl()}/auth/confirm?next=/tableau-de-bord` },
+    options: { emailRedirectTo: `${await siteUrl()}/auth/confirm?next=/onboarding` },
   });
   if (error?.status === 429) return { status: "error", message: mapAuthError(error.code, 429) };
   return { status: "success", message: "Si une inscription est en attente pour cette adresse, un nouveau lien a été envoyé." };

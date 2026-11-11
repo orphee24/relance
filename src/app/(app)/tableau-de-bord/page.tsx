@@ -32,7 +32,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   const today = new Date().toISOString().slice(0, 10);
 
   const [profileRes, statusRes, oppRes, recoRes, reminderRes] = await Promise.all([
-    supabase.from("user_profiles").select("first_name").eq("id", user!.id).maybeSingle(),
+    supabase.from("user_profiles").select("first_name, onboarding_step, onboarding_completed_at").eq("id", user!.id).maybeSingle(),
     supabase.from("applications").select("status").is("archived_at", null),
     supabase
       .from("applications")
@@ -81,6 +81,24 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
 
       <div className="grid gap-4">
         {params["mot-de-passe"] === "modifie" ? <Alert tone="success">Votre mot de passe a été modifié.</Alert> : null}
+        {params.bienvenue ? (
+          <Alert tone="success" title="Votre profil est prêt.">
+            Prochaine étape : analysez une offre qui vous intéresse.
+          </Alert>
+        ) : null}
+        {profileRes.data && !profileRes.data.onboarding_completed_at ? (
+          <div className="flex flex-wrap items-center gap-4 rounded-panel border border-emerald/30 bg-emerald-wash px-5 py-4">
+            <div className="min-w-0 flex-1">
+              <p className="font-medium">Complétez votre profil</p>
+              <p className="text-sm text-muted">
+                Étape {Math.min(5, (profileRes.data.onboarding_step ?? 0) + 1)} sur 5. Relance s&apos;en sert pour évaluer les offres et repérer les bonnes personnes.
+              </p>
+            </div>
+            <Button size="sm" asChild>
+              <Link href="/onboarding">Reprendre</Link>
+            </Button>
+          </div>
+        ) : null}
         {loadError ? (
           <Alert tone="danger" title="Certaines données n'ont pas pu être chargées.">
             Rechargez la page. Si le problème persiste, vérifiez que les migrations de la base ont été appliquées.
