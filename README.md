@@ -6,7 +6,7 @@ Copilote de recherche d'emploi : analyse CV/offre, CRM de candidatures et **Netw
 
 Spécifications : [`docs/`](docs) — [Produit](docs/PRODUCT.md) · [Architecture](docs/ARCHITECTURE.md) · [Base de données](docs/DATABASE.md) · [Moteur réseau](docs/NETWORK_ENGINE.md) · [Sécurité & RGPD](docs/SECURITY.md) · [Roadmap](docs/ROADMAP.md)
 
-## État actuel — fin de la phase 2
+## État actuel — fin de la phase 3
 
 | Fonctionnalité | État | Détail |
 |---|---|---|
@@ -24,7 +24,8 @@ Spécifications : [`docs/`](docs) — [Produit](docs/PRODUCT.md) · [Architectur
 | Import CV PDF/DOCX, extraction, analyse sans IA, ancrage, anti-injection, PDF | ✅ Testés | Sur fichiers générés (`tests/fixtures`, données fictives) |
 | Extraction des CV par IA | 🟡 Adaptateur testé avec réponses simulées | Activé par `ANTHROPIC_API_KEY` ; jamais appelé réellement |
 | Vérification du profil, versions, CV principal, export PDF | 🟡 Logique SQL et rendu PDF testés | Parcours complet non testé contre Supabase réel |
-| Autres écrans (candidatures, analyse, réseau…) | ⬜ | Affichent clairement « en construction » avec leur contenu prévu |
+| Analyse d'offre : critères, score de couverture expliqué, suggestions, version adaptée | ✅ Moteur testé / 🟡 parcours complet | Logique et quotas testés ; enregistrement non testé contre Supabase réel ; IA simulée |
+| Autres écrans (candidatures, réseau…) | ⬜ | Affichent clairement « en construction » avec leur contenu prévu |
 
 Reporté après le MVP : coach d'entretien vocal, découverte intégrée de contacts (fournisseurs sous contrat), Relance Campus, Relance Employer.
 

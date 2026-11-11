@@ -40,11 +40,25 @@ Légende : ✅ fait et vérifié · 🟡 partiel / simulé · ⬜ à faire
 - Les CV scannés (images) ne sont pas lus : pas d'OCR pour l'instant.
 - Traitement synchrone dans la requête (quelques secondes) ; passage en tâche asynchrone si les temps de réponse IA l'exigent.
 
-## Phase 3 — Offres et analyses IA
-- ✅ Couche fournisseur LLM (livrée en phase 2)
-- ⬜ Extraction des critères d'offre
-- ⬜ Score de couverture explicable (moteur déterministe déjà écrit en phase 1 : `src/server/analysis/coverage.ts`)
-- ⬜ Suggestions de modification acceptables / refusables une par une
+## Phase 3 — Offres et analyses
+- ✅ Saisie de l'offre par copier-coller (le lien est conservé pour référence, jamais récupéré automatiquement)
+- ✅ Extraction déterministe des critères : sections, obligatoire/souhaité, 8 catégories, contrat, salaire — y compris offres sans intitulés
+- ✅ Comparaison au CV **vérifié** : outils/compétences (termes exacts, sans confusion de sous-mots), durée d'expérience (chevauchements comptés une fois), niveau **et spécialité** du diplôme, langue et niveau
+- ✅ Score de couverture explicable (obligatoire ×3, souhaité ×1, partiel ½) ; chaque critère avec son explication et les extraits offre/CV
+- ✅ Suggestions vérifiables, acceptées ou refusées une par une ; version de CV adaptée rattachée à l'offre, puis réanalyse ; CV d'origine intact
+- ✅ Quotas infalsifiables (journal non modifiable par l'utilisateur, consommation atomique, restitution en cas d'échec)
+- ✅ Résolution d'entreprise : jamais à partir du domaine d'un site d'emploi
+- 🟡 Extraction et comparaison par IA : adaptateur et ancrage testés avec réponses simulées, **jamais appelés réellement**
+- 🟡 Enregistrement des analyses et parcours complet : **non testés contre un vrai projet Supabase**
+- ✅ Tests : 89 unitaires, 38 E2E, 3 suites SQL
+
+### Décisions à valider
+- Quota Free : 3 analyses sur **30 jours glissants** (le brief ne précisait pas la période). Forfaits payants : sur la période du forfait.
+- Le niveau d'expérience compte toute l'expérience datée ; le domaine (« en product design ») n'est pas vérifié automatiquement, et l'explication le dit.
+
+### Limites connues
+- Sans IA, un synonyme (« Sketch » pour « Figma ») n'est pas reconnu : le critère apparaît non démontré.
+- Les qualités personnelles sont marquées « Indéterminé » plutôt que « Non démontré ».
 
 ## Phase 4 — CRM de candidatures
 - ⬜ CRUD, vue table, vue Kanban, filtres, tri, recherche

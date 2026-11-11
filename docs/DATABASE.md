@@ -7,6 +7,8 @@ PostgreSQL 15+ (Supabase), migrations dans `supabase/migrations/`.
 | `…0001_core_schema.sql` | Types, tables, index, triggers, RLS, privilèges, fonctions métier |
 | `…0002_semantic_search.sql` | pgvector : embeddings (1536 dim.), index HNSW, `match_user_skills` |
 | `…0003_storage.sql` | Bucket privé `resumes`, policies par dossier `user_id/` |
+| `…0004_resume_workflow.sql` | Validation atomique d'un CV (`save_verified_resume`), CV principal |
+| `…0005_quotas_and_adapted_versions.sql` | `quota_events` (lecture seule pour l'utilisateur), `consume_quota` / `refund_quota` / `quota_status`, versions de CV rattachées à une offre |
 
 ## 1. Principes
 
@@ -64,6 +66,9 @@ auth.users ─1:1─ user_profiles
 | `export_my_data()` | Export RGPD JSON (security invoker → RLS) | authenticated |
 | `match_user_skills(vector, int)` | Similarité sémantique sur ses compétences | authenticated |
 | `purge_expired_third_party_contacts()` | Rétention | service role |
+| `save_verified_resume(...)` | Nouvelle version + compétences vérifiées, en une transaction | authenticated |
+| `set_primary_resume(uuid)` | CV principal unique | authenticated |
+| `consume_quota(text)` / `refund_quota(uuid)` / `quota_status(text)` | Quotas par forfait, atomiques, non falsifiables | authenticated |
 
 ## 7. Suppression de compte
 
