@@ -1,26 +1,145 @@
 @import "tailwindcss";
+@import "@fontsource-variable/schibsted-grotesk";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ---------------------------------------------------------------------------
+   RELANCE — design tokens
+   Papier clair légèrement froid, encre vert-de-gris, émeraude profond.
+   Trois signaux de fiabilité : vérifié / hypothèse / inconnu.
+--------------------------------------------------------------------------- */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --paper: #fafbfa;
+  --surface: #ffffff;
+  --surface-sunken: #f2f5f3;
+  --ink: #18211d;
+  --ink-muted: #5c6964;
+  --ink-faint: #85918c;
+  --line: #e2e7e4;
+  --line-strong: #cbd3cf;
+
+  --emerald: #0a6b4d;
+  --emerald-strong: #054834;
+  --emerald-wash: #e7f3ed;
+  --on-emerald: #ffffff;
+
+  --signal-verified: #0a6b4d;
+  --signal-inferred: #a86a12;
+  --signal-inferred-wash: #fbf1e1;
+  --signal-unknown: #6b7480;
+  --signal-unknown-wash: #eff1f3;
+
+  --danger: #b42318;
+  --danger-wash: #fdecea;
+
+  --focus: #0a6b4d;
+  --r-control: 6px;
+  --r-panel: 10px;
+}
+
+:root.dark {
+  --paper: #0f1513;
+  --surface: #151d1a;
+  --surface-sunken: #111816;
+  --ink: #e6eeea;
+  --ink-muted: #a3b0aa;
+  --ink-faint: #75827c;
+  --line: #26312d;
+  --line-strong: #35423d;
+
+  --emerald: #34b98a;
+  --emerald-strong: #5fd1a6;
+  --emerald-wash: #14312a;
+  --on-emerald: #06231a;
+
+  --signal-verified: #34b98a;
+  --signal-inferred: #e0a54a;
+  --signal-inferred-wash: #33271a;
+  --signal-unknown: #9aa3ad;
+  --signal-unknown-wash: #222a2f;
+
+  --danger: #f2796f;
+  --danger-wash: #3a1d1b;
+
+  --focus: #5fd1a6;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-sunken: var(--surface-sunken);
+  --color-ink: var(--ink);
+  --color-muted: var(--ink-muted);
+  --color-faint: var(--ink-faint);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-emerald: var(--emerald);
+  --color-emerald-strong: var(--emerald-strong);
+  --color-emerald-wash: var(--emerald-wash);
+  --color-on-emerald: var(--on-emerald);
+  --color-verified: var(--signal-verified);
+  --color-inferred: var(--signal-inferred);
+  --color-inferred-wash: var(--signal-inferred-wash);
+  --color-unknown: var(--signal-unknown);
+  --color-unknown-wash: var(--signal-unknown-wash);
+  --color-danger: var(--danger);
+  --color-danger-wash: var(--danger-wash);
+  --color-focus: var(--focus);
+
+  --radius-control: var(--r-control);
+  --radius-panel: var(--r-panel);
+
+  --font-sans: "Schibsted Grotesk Variable", ui-sans-serif, system-ui, sans-serif;
+
+  /* Échelle typographique (ratio ~1.25) */
+  --text-xs: 0.8125rem;
+  --text-xs--line-height: 1.25rem;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.375rem;
+  --text-base: 1rem;
+  --text-base--line-height: 1.625rem;
+  --text-lg: 1.25rem;
+  --text-lg--line-height: 1.75rem;
+  --text-xl: 1.625rem;
+  --text-xl--line-height: 2rem;
+  --text-2xl: 2.125rem;
+  --text-2xl--line-height: 2.5rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  html {
+    color-scheme: light;
+  }
+  html.dark {
+    color-scheme: dark;
+  }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-feature-settings: "ss01", "cv11";
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3 {
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
+  }
+  :focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+  ::selection {
+    background: var(--emerald-wash);
+    color: var(--ink);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }
