@@ -61,8 +61,22 @@ Légende : ✅ fait et vérifié · 🟡 partiel / simulé · ⬜ à faire
 - Les qualités personnelles sont marquées « Indéterminé » plutôt que « Non démontré ».
 
 ## Phase 4 — CRM de candidatures
-- ⬜ CRUD, vue table, vue Kanban, filtres, tri, recherche
-- ⬜ Historique d'événements, rappels, calendrier, doublons, export CSV
+- ✅ Création manuelle, ou en un clic depuis une offre analysée (offre, entreprise et version de CV rattachées)
+- ✅ Détection des doublons (entreprise + intitulé normalisés) : avertissement, l'utilisateur décide
+- ✅ Vue liste (recherche, filtres par étape et canal, tri, archives) et vue Kanban (glisser-déposer + menu de statut accessible au clavier, mise à jour optimiste)
+- ✅ Changement de statut par fonction SQL : historique automatique, date d'envoi renseignée au premier envoi ; « Refusée » demande une confirmation explicite
+- ✅ Délai depuis l'envoi affiché comme un fait (« Envoyée il y a 12 jours ») ; « Sans réponse » rappelé comme distinct d'un refus
+- ✅ Fiche candidature : informations modifiables, historique et notes, prochaine action, rappels (fait / rouvrir), liens vers l'analyse et le CV, archivage, suppression confirmée
+- ✅ Limite Free de 5 candidatures suivies imposée par la base (archiver libère une place)
+- ✅ Export CSV pour Excel (séparateur « ; », protection contre l'injection de formules) et agenda .ics (rappels et prochaines actions)
+- ✅ Encart « Personnes à contacter » avec l'état vide de la spécification (phase 5)
+- 🟡 Parcours complets : **non testés contre un vrai projet Supabase** (logique SQL testée ; écrans vérifiés sur données fictives)
+- ✅ Tests : 104 unitaires, 46 E2E, 4 suites SQL
+
+### Limites connues
+- La recherche est sensible aux accents (« Societe » ne trouve pas « Société »).
+- L'agenda .ics est un export ponctuel, pas un abonnement synchronisé.
+- Les heures des rappels utilisent le décalage horaire du jour de saisie (écart d'une heure possible autour d'un changement d'heure).
 
 ## Phase 5 — Network Intelligence Engine (niveau 1)
 - ⬜ Résolution d'entreprise + alias

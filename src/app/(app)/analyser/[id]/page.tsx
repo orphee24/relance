@@ -36,5 +36,6 @@ export default async function OfferAnalysisPage({
       </>
     );
   }
-  return <AnalysisView offer={offer} analysis={parsed.data} sp={sp} />;
+  const { data: application } = await supabase.from("applications").select("id").eq("offer_id", offer.id).limit(1).maybeSingle();
+  return <AnalysisView offer={offer} analysis={parsed.data} sp={sp} applicationId={application?.id ?? null} />;
 }

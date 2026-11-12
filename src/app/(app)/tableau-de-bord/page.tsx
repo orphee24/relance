@@ -4,8 +4,9 @@ import { BellRing, CalendarCheck2, ListChecks, ScanSearch } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
-import { Alert, Badge, EmptyState } from "@/components/ui/misc";
-import { APPLICATION_STATUS_LABELS, type ApplicationStatus } from "@/config/domain";
+import { Alert, EmptyState } from "@/components/ui/misc";
+import { type ApplicationStatus } from "@/config/domain";
+import { StatusBadge } from "@/components/applications/status";
 import { createClient } from "@/lib/supabase/server";
 import { computeSearchMetrics, countByStatus } from "@/server/analytics/metrics";
 import { formatNumber, formatRate } from "@/lib/utils";
@@ -190,10 +191,12 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
                 return (
                   <li key={o.id} className="flex flex-wrap items-center gap-x-6 gap-y-2 px-5 py-3.5">
                     <div className="min-w-0 basis-full sm:basis-0 sm:flex-1">
-                      <p className="truncate font-medium">{o.job_title}</p>
+                      <Link href={`/candidatures/${o.id}`} className="block truncate font-medium hover:text-emerald hover:underline">
+                        {o.job_title}
+                      </Link>
                       <p className="truncate text-sm text-muted">{o.company_name}</p>
                     </div>
-                    <Badge>{APPLICATION_STATUS_LABELS[o.status as ApplicationStatus]}</Badge>
+                    <StatusBadge status={o.status as ApplicationStatus} />
                     <p className="text-sm tabular-nums text-muted sm:w-28" title="Estimation interne de couverture CV/offre, pas un score ATS">
                       {coverage != null ? `Couverture ${Math.round(Number(coverage))} %` : "Non analysée"}
                     </p>

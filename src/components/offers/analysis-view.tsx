@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ExternalLink, FileText, ShieldAlert, Sparkles } from "lucide-react";
+import { ExternalLink, FileText, ListChecks, ShieldAlert, Sparkles } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { CoverageBadge, CoverageGauge, CoverageMark } from "@/components/offers/coverage";
 import { SuggestionCard } from "@/components/offers/suggestion-card";
@@ -10,6 +10,7 @@ import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
 import { CONTRACT_TYPES } from "@/lib/validation/onboarding";
 import type { RequirementResult, StoredAnalysis } from "@/lib/validation/offer";
 import { createAdaptedVersion, deleteOffer } from "@/app/(app)/analyser/actions";
+import { trackOffer } from "@/app/(app)/candidatures/actions";
 
 const CATEGORY_LABELS: Record<RequirementResult["category"], string> = {
   skill: "Compétence",
@@ -36,10 +37,12 @@ export function AnalysisView({
   offer,
   analysis,
   sp,
+  applicationId = null,
 }: {
   offer: OfferSummary;
   analysis: StoredAnalysis;
   sp: { adaptee?: string; avant?: string; erreur?: string };
+  applicationId?: string | null;
 }) {
   const a = analysis;
   const mandatory = a.requirements.filter((r) => r.kind === "mandatory");
@@ -64,14 +67,32 @@ export function AnalysisView({
           </span>
         }
         actions={
-          offer.url ? (
-            <Button variant="secondary" asChild>
-              <a href={offer.url} target="_blank" rel="noopener noreferrer nofollow">
-                <ExternalLink />
-                Voir l&apos;offre
-              </a>
-            </Button>
-          ) : null
+          <>
+            {offer.url ? (
+              <Button variant="secondary" asChild>
+                <a href={offer.url} target="_blank" rel="noopener noreferrer nofollow">
+                  <ExternalLink />
+                  Voir l&apos;offre
+                </a>
+              </Button>
+            ) : null}
+            {applicationId ? (
+              <Button variant="secondary" asChild>
+                <Link href={`/candidatures/${applicationId}`}>
+                  <ListChecks />
+                  Voir la candidature
+                </Link>
+              </Button>
+            ) : (
+              <form action={trackOffer}>
+                <input type="hidden" name="offerId" value={offer.id} />
+                <SubmitButton pendingLabel="Ajout…" className="w-auto">
+                  <ListChecks />
+                  Suivre cette candidature
+                </SubmitButton>
+              </form>
+            )}
+          </>
         }
       />
 
@@ -82,7 +103,13 @@ export function AnalysisView({
             {sp.avant && a.score != null ? ` Couverture : ${Math.round(Number(sp.avant))} % → ${Math.round(a.score)} %.` : ""} Votre CV d&apos;origine reste inchangé.
           </Alert>
         ) : null}
-        {sp.erreur ? <Alert tone="danger">La version adaptée n&apos;a pas pu être créée. Réessayez.</Alert> : null}
+        {sp.erreur === "limite" ? (
+          <Alert tone="danger">Vous suivez déjà le nombre maximal de candidatures de votre forfait. Archivez une candidature terminée pour suivre celle-ci.</Alert>
+        ) : sp.erreur === "suivi" ? (
+          <Alert tone="danger">La candidature n&apos;a pas pu être créée. Réessayez.</Alert>
+        ) : sp.erreur ? (
+          <Alert tone="danger">La version adaptée n&apos;a pas pu être créée. Réessayez.</Alert>
+        ) : null}
         {a.ignoredLines.length > 0 ? (
           <Alert tone="info" title="Une partie du texte de l'offre a été ignorée">
             <span className="inline-flex items-start gap-2">
