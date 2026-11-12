@@ -7,7 +7,7 @@ test.describe("Accès et protection des routes", () => {
     await expect(page.getByText("Hypothèse").first()).toBeVisible();
   });
 
-  for (const path of ["/tableau-de-bord", "/candidatures", "/parametres", "/reseau", "/onboarding", "/cv", "/cv/00000000-0000-0000-0000-000000000000/verifier", "/analyser", "/analyser/00000000-0000-0000-0000-000000000000", "/candidatures/nouvelle", "/candidatures/00000000-0000-0000-0000-000000000000"]) {
+  for (const path of ["/tableau-de-bord", "/candidatures", "/parametres", "/reseau", "/onboarding", "/cv", "/cv/00000000-0000-0000-0000-000000000000/verifier", "/analyser", "/analyser/00000000-0000-0000-0000-000000000000", "/candidatures/nouvelle", "/candidatures/00000000-0000-0000-0000-000000000000", "/reseau/nouveau", "/reseau/importer", "/reseau/00000000-0000-0000-0000-000000000000", "/entreprises", "/entreprises/00000000-0000-0000-0000-000000000000"]) {
     test(`${path} redirige un visiteur vers la connexion`, async ({ page }) => {
       await page.goto(path);
       await expect(page).toHaveURL(new RegExp(`/connexion\\?next=${encodeURIComponent(path).replace(/%2F/g, "(%2F|/)")}`));

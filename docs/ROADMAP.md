@@ -79,10 +79,27 @@ Légende : ✅ fait et vérifié · 🟡 partiel / simulé · ⬜ à faire
 - Les heures des rappels utilisent le décalage horaire du jour de saisie (écart d'une heure possible autour d'un changement d'heure).
 
 ## Phase 5 — Network Intelligence Engine (niveau 1)
-- ⬜ Résolution d'entreprise + alias
-- ⬜ Fournisseurs `user_manual`, `user_import`, `assisted_search`, `company_site`
-- ⬜ Score de pertinence (moteur déjà écrit : `src/server/network/relevance.ts`)
-- ⬜ Onglet « Personnes à contacter », CRM réseau
+- ✅ Onglet « Personnes à contacter » sur chaque candidature : classement par pertinence, détail des 5 critères (inconnu = non compté, affiché comme tel), stratégie suggérée (règles §2.4), état vide sans faux profil
+- ✅ Recherche assistée : 6 requêtes ciblées (collègues, managers, recruteurs, page équipe) ouvertes par l'utilisateur dans ses comptes ; Relance ne lance aucune requête
+- ✅ Saisie d'une personne (fonction, service, lieu, lien de profil, connexion commune) ; rôle déduit de la fonction ; score calculé au rattachement
+- ✅ Page « équipe » officielle : texte collé par l'utilisateur, extraction nom/fonction, sélection explicite avant enregistrement, source et date conservées
+- ✅ Import consenti des relations (CSV LinkedIn ou équivalent) : emails ignorés, liens non https écartés, doublons détectés, consentement journalisé, quota quotidien
+- ✅ Suggestions « Dans votre réseau chez … » : rapprochement uniquement sur nom d'entreprise normalisé identique, à confirmer
+- ✅ Fiche personne : sources et base légale, vérifications datées (« à revérifier » après 6 mois), statut, échanges (statut mis à jour automatiquement), notes, suppression avec sources
+- ✅ « Ne plus contacter » bloquant (base) ; alerte après 2 relances sans réponse
+- ✅ Anti-collecte : 50 fiches saisies/extraites par jour, recherche par candidature uniquement, entreprises visibles seulement si liées aux données de l'utilisateur
+- ✅ Explorer les entreprises : candidatures, personnes identifiées, recherche assistée, extraction de page équipe
+- 🟡 Parcours complets : **non testés contre un vrai projet Supabase** (logique SQL et moteur testés ; écrans vérifiés sur données fictives)
+- ✅ Tests : 131 unitaires, 56 E2E, 5 suites SQL
+
+### Décisions à valider
+- Quota « recherches réseau » (Free : 2/jour) appliqué aux **imports** de contacts ; la saisie et l'extraction sont plafonnées à 50 fiches/jour pour tous.
+- Une personne listée sur une page officielle de l'entreprise est marquée « poste vérifié » à la date de l'extraction.
+- Une relation importée compte comme « connexion commune » (relation directe) dans le score.
+
+### Limites connues
+- L'extraction de page équipe reconnaît les formats courants (« Nom — Fonction », nom puis fonction) ; les mises en page atypiques demandent une saisie manuelle.
+- Le rapprochement par entreprise ne reconnaît pas les noms commerciaux différents (« Groupe X » / « X France ») : ajout manuel possible.
 
 ## Phase 6 — Messages, relances, recommandations
 - ⬜ Générateur de messages (6 destinataires × 4 tons) avec contrôles

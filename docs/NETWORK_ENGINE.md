@@ -44,7 +44,7 @@ Fournisseurs MVP :
 - `user_manual` : saisie manuelle d'un profil consulté par l'utilisateur ;
 - `user_import` : import CSV de contacts (export de son propre réseau), avec consentement enregistré ;
 - `assisted_search` : génère les liens de recherche, ne récupère rien automatiquement ;
-- `company_site` : pages équipe officielles **fournies par l'utilisateur** (URL qu'il consulte), extraction des noms/fonctions présents publiquement.
+- `company_site` : pages équipe officielles consultées par l'utilisateur, qui **colle leur texte** (Relance n'ouvre pas la page) ; extraction des noms/fonctions, sélection explicite, URL et date conservées.
 
 Chaque contact conserve `contact_sources` (fournisseur, URL, date) et `contact_verifications` (méthode, date, résultat).
 

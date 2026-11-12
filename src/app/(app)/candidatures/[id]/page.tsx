@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Archive, ArchiveRestore, BellRing, Check, ExternalLink, FileText, RotateCcw, ScanSearch, Users } from "lucide-react";
+import { Archive, ArchiveRestore, BellRing, Check, ExternalLink, FileText, RotateCcw, ScanSearch } from "lucide-react";
 import { DueLabel } from "@/components/applications/due-label";
 import { EditableDetails, NoteForm, ReminderForm, StatusControl } from "@/components/applications/detail-controls";
 import { StatusBadge } from "@/components/applications/status";
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
-import { Alert, EmptyState } from "@/components/ui/misc";
+import { Alert } from "@/components/ui/misc";
 import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
 import { APPLICATION_STATUS_LABELS, type ApplicationStatus } from "@/config/domain";
 import { createClient } from "@/lib/supabase/server";
@@ -16,6 +16,7 @@ import { CONTRACT_TYPES } from "@/lib/validation/onboarding";
 import { waitingInfo } from "@/server/applications/insights";
 import { completeReminder, deleteApplication, setArchived } from "../actions";
 import { DeleteApplicationButton } from "./delete-button";
+import { PeoplePanel } from "@/components/network/people-panel";
 
 export const metadata: Metadata = { title: "Candidature" };
 
@@ -116,6 +117,7 @@ export default async function ApplicationPage({
       />
 
       <div className="grid gap-4">
+        {sp.contact === "ajoute" ? <Alert tone="success">Personne ajoutée et rattachée à cette candidature.</Alert> : null}
         {sp.creee ? <Alert tone="success">Candidature ajoutée. Programmez une prochaine action pour ne pas la perdre de vue.</Alert> : null}
         {sp.archivee ? <Alert tone="success">Candidature archivée : elle ne compte plus dans la limite de votre forfait.</Alert> : null}
         {sp.restauree ? <Alert tone="success">Candidature restaurée.</Alert> : null}
@@ -277,17 +279,6 @@ export default async function ApplicationPage({
             </Panel>
 
             <Panel>
-              <PanelHeader title="Personnes à contacter" />
-              <PanelBody>
-                <EmptyState
-                  icon={Users}
-                  title="Aucun contact vérifié trouvé pour le moment."
-                  description="La recherche assistée de collaborateurs, l'import de vos contacts et les pages officielles de l'entreprise arrivent avec la phase 5. Relance ne propose jamais de profil inventé."
-                />
-              </PanelBody>
-            </Panel>
-
-            <Panel>
               <PanelBody className="flex flex-wrap items-center gap-2">
                 <form action={setArchived}>
                   <input type="hidden" name="id" value={app.id} />
@@ -302,6 +293,8 @@ export default async function ApplicationPage({
             </Panel>
           </div>
         </div>
+
+        <PeoplePanel supabase={supabase} applicationId={app.id} archived={Boolean(app.archived_at)} />
       </div>
     </>
   );

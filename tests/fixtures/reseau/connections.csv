@@ -1,0 +1,10 @@
+Notes:
+"When exporting your connection data, you may notice that some of the email addresses are missing. (Fictional test file.)"
+
+First Name,Last Name,URL,Email Address,Company,Position,Connected On
+Claire,Durand,https://www.linkedin.com/in/claire-durand-exemple,claire@exemple.test,Néobanque Exemple SAS,Lead Product Designer,12 Mar 2024
+Karim,Benali,https://www.linkedin.com/in/karim-benali-exemple,,Néobanque Exemple,Talent Acquisition Partner,03 Jan 2025
+"Léa","D'Almeida, PhD","https://www.linkedin.com/in/lea-dalmeida-exemple","","Santé Exemple","UX Researcher
+(temps partiel)",21 Jun 2023
+,,,,,,
+Tom,Martin,http://insecure.example/tom,,Autre Exemple,Développeur,01 Feb 2022
