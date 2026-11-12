@@ -47,7 +47,9 @@ export function PeoplePanelView({ data, archived }: { data: NonNullable<Awaited<
             <span className="font-medium">Objectif :</span> {STRATEGIES[recommendation.strategy].goal}{" "}
             <span className="text-muted">{STRATEGIES[recommendation.strategy].ask}</span>
           </p>
-          <p className="text-xs text-muted">La rédaction assistée des messages arrive avec la phase 6.</p>
+          <Link href={`/reseau/${recommended.networkId}/message?candidature=${app.id}`} className="justify-self-start text-sm font-medium text-emerald hover:underline">
+            Préparer un message pour {recommended.name}
+          </Link>
         </PanelBody>
       ) : null}
 

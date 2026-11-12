@@ -17,6 +17,8 @@ import { waitingInfo } from "@/server/applications/insights";
 import { completeReminder, deleteApplication, setArchived } from "../actions";
 import { DeleteApplicationButton } from "./delete-button";
 import { PeoplePanel } from "@/components/network/people-panel";
+import { DiagnosisPanel } from "@/components/messages/diagnosis-panel";
+import { loadDiagnosis } from "@/server/followup/load";
 
 export const metadata: Metadata = { title: "Candidature" };
 
@@ -71,6 +73,7 @@ export default async function ApplicationPage({
     supabase.from("reminders").select("id, title, due_at, completed_at").eq("application_id", id).order("due_at"),
   ]);
   if (!app) notFound();
+  const silence = await loadDiagnosis(supabase, id);
 
   const offer = Array.isArray(app.job_offers) ? app.job_offers[0] : app.job_offers;
   const version = Array.isArray(app.resume_versions) ? app.resume_versions[0] : app.resume_versions;
@@ -117,6 +120,7 @@ export default async function ApplicationPage({
       />
 
       <div className="grid gap-4">
+        {sp.relance === "envoyee" ? <Alert tone="success">Relance enregistrée. Relance vous proposera la suite le moment venu.</Alert> : null}
         {sp.contact === "ajoute" ? <Alert tone="success">Personne ajoutée et rattachée à cette candidature.</Alert> : null}
         {sp.creee ? <Alert tone="success">Candidature ajoutée. Programmez une prochaine action pour ne pas la perdre de vue.</Alert> : null}
         {sp.archivee ? <Alert tone="success">Candidature archivée : elle ne compte plus dans la limite de votre forfait.</Alert> : null}
@@ -124,7 +128,7 @@ export default async function ApplicationPage({
         {sp.erreur === "limite" ? (
           <Alert tone="danger">Vous suivez déjà le nombre maximal de candidatures de votre forfait. Archivez-en une autre d&apos;abord.</Alert>
         ) : null}
-        {status === "no_response" ? (
+        {status === "no_response" && !silence?.diagnosis.applicable ? (
           <Alert tone="info" title="Sans réponse ne veut pas dire refusée">
             Les délais de réponse varient beaucoup d&apos;une entreprise à l&apos;autre. Une relance courte, ou un contact dans
             l&apos;équipe, permet souvent d&apos;en savoir plus.
@@ -190,6 +194,7 @@ export default async function ApplicationPage({
           </div>
 
           <div className="grid content-start gap-4">
+            {silence && !app.archived_at ? <DiagnosisPanel d={silence.diagnosis} applicationId={app.id} compact /> : null}
             <Panel>
               <PanelHeader title="Prochaine action et rappels" />
               <PanelBody className="grid gap-4">

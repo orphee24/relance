@@ -8,6 +8,7 @@ PostgreSQL 15+ (Supabase), migrations dans `supabase/migrations/`.
 | `…0002_semantic_search.sql` | pgvector : embeddings (1536 dim.), index HNSW, `match_user_skills` |
 | `…0003_storage.sql` | Bucket privé `resumes`, policies par dossier `user_id/` |
 | `…0004_resume_workflow.sql` | Validation atomique d'un CV (`save_verified_resume`), CV principal |
+| `…0008_messages_recommendations.sql` | `record_contact_message_sent`, `record_application_follow_up` (2 max), `replace_today_recommendations` |
 | `…0007_network.sql` | `add_network_contact` (fiche + source + vérification + rattachement, plafond 50/jour), `import_network_contacts` (consentement, doublons), `log_network_interaction` |
 | `…0006_application_tracking.sql` | Limite de candidatures suivies par forfait (trigger), `set_application_status` |
 | `…0005_quotas_and_adapted_versions.sql` | `quota_events` (lecture seule pour l'utilisateur), `consume_quota` / `refund_quota` / `quota_status`, versions de CV rattachées à une offre |

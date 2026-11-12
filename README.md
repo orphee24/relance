@@ -6,7 +6,7 @@ Copilote de recherche d'emploi : analyse CV/offre, CRM de candidatures et **Netw
 
 Spécifications : [`docs/`](docs) — [Produit](docs/PRODUCT.md) · [Architecture](docs/ARCHITECTURE.md) · [Base de données](docs/DATABASE.md) · [Moteur réseau](docs/NETWORK_ENGINE.md) · [Sécurité & RGPD](docs/SECURITY.md) · [Roadmap](docs/ROADMAP.md)
 
-## État actuel — fin de la phase 5
+## État actuel — fin de la phase 6
 
 | Fonctionnalité | État | Détail |
 |---|---|---|
@@ -27,7 +27,8 @@ Spécifications : [`docs/`](docs) — [Produit](docs/PRODUCT.md) · [Architectur
 | Analyse d'offre : critères, score de couverture expliqué, suggestions, version adaptée | ✅ Moteur testé / 🟡 parcours complet | Logique et quotas testés ; enregistrement non testé contre Supabase réel ; IA simulée |
 | Suivi des candidatures : liste, Kanban, historique, notes, rappels, doublons, exports CSV et agenda | ✅ Logique testée / 🟡 parcours complet | Non testé contre Supabase réel |
 | Réseau niveau 1 : personnes à contacter, score expliqué, stratégie, recherche assistée, page équipe, import consenti, CRM réseau | ✅ Moteur testé / 🟡 parcours complet | Non testé contre Supabase réel |
-| Autres écrans (actions, entretiens, statistiques) | ⬜ | Affichent clairement « en construction » avec leur contenu prévu |
+| Messages contrôlés, diagnostic des silences, 3 actions par jour, statistiques | ✅ Logique testée / 🟡 parcours complet | IA simulée ; non testé contre Supabase réel |
+| Coach d'entretien | ⬜ | Reporté en phase 7 | Affichent clairement « en construction » avec leur contenu prévu |
 
 Reporté après le MVP : coach d'entretien vocal, découverte intégrée de contacts (fournisseurs sous contrat), Relance Campus, Relance Employer.
 

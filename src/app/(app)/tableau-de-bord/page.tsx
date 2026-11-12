@@ -9,6 +9,8 @@ import { type ApplicationStatus } from "@/config/domain";
 import { StatusBadge } from "@/components/applications/status";
 import { createClient } from "@/lib/supabase/server";
 import { computeSearchMetrics, countByStatus } from "@/server/analytics/metrics";
+import { hrefFor, type RecommendationKind } from "@/server/recommendations/engine";
+import { ensureTodayRecommendations } from "@/server/recommendations/load";
 import { formatNumber, formatRate } from "@/lib/utils";
 
 export const metadata: Metadata = { title: "Tableau de bord" };
@@ -30,7 +32,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
 
   const endOfDay = new Date();
   endOfDay.setHours(23, 59, 59, 999);
-  const today = new Date().toISOString().slice(0, 10);
+  const { today } = await ensureTodayRecommendations(supabase);
 
   const [profileRes, statusRes, oppRes, recoRes, reminderRes] = await Promise.all([
     supabase.from("user_profiles").select("first_name, onboarding_step, onboarding_completed_at").eq("id", user!.id).maybeSingle(),
@@ -44,7 +46,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
       .limit(5),
     supabase
       .from("recommendations")
-      .select("id, title, reason, priority")
+      .select("id, kind, title, reason, priority, application_id, network_contact_id")
       .eq("for_date", today)
       .eq("status", "pending")
       .order("priority", { ascending: false })
@@ -131,12 +133,17 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
                     </li>
                   ))}
                   {recommendations.map((r) => (
-                    <li key={r.id} className="flex gap-3 rounded-control border border-line p-3">
-                      <CalendarCheck2 className="mt-0.5 size-4 shrink-0 text-emerald" aria-hidden="true" />
-                      <div>
-                        <p className="font-medium">{r.title}</p>
-                        <p className="text-sm text-muted">{r.reason}</p>
-                      </div>
+                    <li key={r.id}>
+                      <Link
+                        href={hrefFor({ kind: r.kind as RecommendationKind, applicationId: r.application_id, networkContactId: r.network_contact_id })}
+                        className="flex gap-3 rounded-control border border-line p-3 transition-colors hover:border-emerald/50 hover:bg-sunken"
+                      >
+                        <CalendarCheck2 className="mt-0.5 size-4 shrink-0 text-emerald" aria-hidden="true" />
+                        <span>
+                          <span className="block font-medium">{r.title}</span>
+                          <span className="block text-sm text-muted">{r.reason}</span>
+                        </span>
+                      </Link>
                     </li>
                   ))}
                 </ol>
@@ -146,7 +153,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
                 <EmptyState
                   icon={CalendarCheck2}
                   title="Rien d'urgent aujourd'hui."
-                  description="Vos recommandations quotidiennes apparaîtront ici dès que le moteur d'actions sera activé (phase 6). Vos rappels programmés s'affichent déjà."
+                  description="Toutes les actions prioritaires du jour sont faites ou écartées. Les autres pistes sont dans « Mes actions »."
                 />
               )}
             </PanelBody>

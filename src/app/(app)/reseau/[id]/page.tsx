@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { BadgeCheck, ExternalLink } from "lucide-react";
+import { BadgeCheck, ExternalLink, MessageSquareText } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { ContactNotesForm, InteractionForm } from "@/components/network/forms";
 import { VerificationBadge } from "@/components/network/person-card";
@@ -20,9 +20,9 @@ export const metadata: Metadata = { title: "Contact" };
 
 const dateFmt = new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "short", year: "numeric", timeZone: "Europe/Paris" });
 
-export default async function ContactPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ ajoute?: string }> }) {
+export default async function ContactPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ ajoute?: string; message?: string }> }) {
   const { id } = await params;
-  const { ajoute } = await searchParams;
+  const { ajoute, message } = await searchParams;
   if (!/^[0-9a-f-]{36}$/i.test(id)) notFound();
   const supabase = await createClient();
   const loaded = await loadNetworkContact(supabase, id);
@@ -48,18 +48,29 @@ export default async function ContactPage({ params, searchParams }: { params: Pr
           </span>
         }
         actions={
-          p.profileUrl ? (
-            <Button variant="secondary" asChild>
-              <a href={p.profileUrl} target="_blank" rel="noopener noreferrer nofollow">
-                <ExternalLink />
-                Voir le profil
-              </a>
-            </Button>
-          ) : null
+          <>
+            {p.profileUrl ? (
+              <Button variant="secondary" asChild>
+                <a href={p.profileUrl} target="_blank" rel="noopener noreferrer nofollow">
+                  <ExternalLink />
+                  Voir le profil
+                </a>
+              </Button>
+            ) : null}
+            {p.status !== "do_not_contact" ? (
+              <Button asChild>
+                <Link href={`/reseau/${id}/message`}>
+                  <MessageSquareText />
+                  Préparer un message
+                </Link>
+              </Button>
+            ) : null}
+          </>
         }
       />
       <div className="grid gap-4">
         {ajoute ? <Alert tone="success">Personne ajoutée à votre réseau.</Alert> : null}
+        {message === "envoye" ? <Alert tone="success">Message enregistré comme envoyé. Le statut est passé à « Contacté ».</Alert> : null}
         {dnc ? (
           <Alert tone="info" title="Ne plus contacter">
             Relance ne vous proposera plus cette personne et vous empêche d&apos;enregistrer un message vers elle.

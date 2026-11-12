@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ExternalLink, Link2Off, Plus } from "lucide-react";
+import { ExternalLink, Link2Off, MessageSquareText, Plus } from "lucide-react";
 import { linkToApplication, unlinkFromApplication } from "@/app/(app)/reseau/actions";
 import { Button } from "@/components/ui/button";
 import { ConfidenceBadge, ConfidenceMark } from "@/components/ui/confidence";
@@ -73,6 +73,14 @@ export function PersonCard({ p, applicationId, mode }: { p: PersonView; applicat
       </div>
       {mode !== "list" ? <ScoreBreakdown p={p} /> : null}
       <div className="flex flex-wrap gap-2">
+        {mode === "linked" && !dnc ? (
+          <Button variant="secondary" size="sm" asChild>
+            <Link href={`/reseau/${p.networkId}/message${applicationId ? `?candidature=${applicationId}` : ""}`}>
+              <MessageSquareText />
+              Préparer un message
+            </Link>
+          </Button>
+        ) : null}
         {p.profileUrl ? (
           <Button variant="ghost" size="sm" asChild>
             <a href={p.profileUrl} target="_blank" rel="noopener noreferrer nofollow">

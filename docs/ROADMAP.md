@@ -101,10 +101,23 @@ Légende : ✅ fait et vérifié · 🟡 partiel / simulé · ⬜ à faire
 - L'extraction de page équipe reconnaît les formats courants (« Nom — Fonction », nom puis fonction) ; les mises en page atypiques demandent une saisie manuelle.
 - Le rapprochement par entreprise ne reconnaît pas les noms commerciaux différents (« Groupe X » / « X France ») : ajout manuel possible.
 
-## Phase 6 — Messages, relances, recommandations
-- ⬜ Générateur de messages (6 destinataires × 4 tons) avec contrôles
-- ⬜ Diagnostic du silence (faits / hypothèses / inconnus)
-- ⬜ Next Best Action (3/jour, justifiées)
+## Phase 6 — Messages, relances, recommandations, statistiques
+- ✅ Rédaction de messages : 6 destinataires × 4 tons × 5 objets × 3 formats ; modèles construits uniquement sur des faits enregistrés (réalisation citée telle quelle depuis le CV vérifié)
+- ✅ Contrôles sur chaque message (génération et édition) : longueur, demande claire, aucun échange / connexion / école commune non enregistrés, aucun champ à compléter — les 360 combinaisons de modèles testées
+- ✅ Copie puis « J'ai envoyé ce message » : échange enregistré, statut du contact mis à jour ; Relance n'envoie jamais rien
+- ✅ Remerciement possible seulement après un échange enregistré ; aucun message vers « Ne plus contacter » (base)
+- ✅ Diagnostic des candidatures sans réponse : faits, hypothèses (présentées comme telles), inconnues, conseil daté (attendre 7 jours, 2 relances maximum, puis contact direct)
+- ✅ Relances de candidature enregistrées, plafonnées à 2 par la base
+- ✅ Next Best Action : 3 actions par jour (fuseau Europe/Paris), justifiées, une par candidature et par personne ; faites / écartées ne sont pas reproposées ; autres pistes
+- ✅ Statistiques : taux de réponse et d'entretien, envois par semaine, taux par canal (échantillons < 5 signalés), activité réseau
+- 🟡 Rédaction par IA : adaptateur testé avec réponses simulées (texte écarté s'il échoue aux contrôles), **jamais appelé réellement**
+- 🟡 Parcours complets : **non testés contre un vrai projet Supabase**
+- ✅ Tests : 156 unitaires, 64 E2E, 6 suites SQL
+
+### Décisions à valider
+- Quota « relances IA » (Free : 2) décompté pour toute rédaction **par IA** ; les messages par modèle sont illimités. Quota restitué si l'IA échoue ou est écartée.
+- Délais : première relance à J+7, seconde 7 jours après, aucune au-delà ; « faire le point » proposé à J+45 après 2 relances.
+- Le coach d'entretien (module 7) est reporté à la phase 7.
 
 ## Phase 7 — Paiements, quotas, administration
 - ⬜ Stripe Checkout (paiement unique 30 jours), webhooks, historique

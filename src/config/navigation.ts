@@ -28,7 +28,7 @@ export const NAV_ITEMS: NavItem[] = [
   { href: "/reseau", label: "Mon réseau", icon: Users, phase: 5 },
   { href: "/actions", label: "Mes actions", icon: CalendarCheck2, phase: 6 },
   { href: "/cv", label: "Mes CV", icon: FileText, phase: 2 },
-  { href: "/entretiens", label: "Mes entretiens", icon: MessagesSquare, phase: 6 },
+  { href: "/entretiens", label: "Mes entretiens", icon: MessagesSquare, phase: 7 },
   { href: "/statistiques", label: "Statistiques", icon: BarChart3, phase: 6 },
   { href: "/parametres", label: "Paramètres", icon: Settings, phase: 1 },
 ];
