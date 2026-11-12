@@ -6,7 +6,7 @@ Copilote de recherche d'emploi : analyse CV/offre, CRM de candidatures et **Netw
 
 Spécifications : [`docs/`](docs) — [Produit](docs/PRODUCT.md) · [Architecture](docs/ARCHITECTURE.md) · [Base de données](docs/DATABASE.md) · [Moteur réseau](docs/NETWORK_ENGINE.md) · [Sécurité & RGPD](docs/SECURITY.md) · [Roadmap](docs/ROADMAP.md)
 
-## État actuel — fin de la phase 6
+## État actuel — fin de la phase 7
 
 | Fonctionnalité | État | Détail |
 |---|---|---|
@@ -28,13 +28,31 @@ Spécifications : [`docs/`](docs) — [Produit](docs/PRODUCT.md) · [Architectur
 | Suivi des candidatures : liste, Kanban, historique, notes, rappels, doublons, exports CSV et agenda | ✅ Logique testée / 🟡 parcours complet | Non testé contre Supabase réel |
 | Réseau niveau 1 : personnes à contacter, score expliqué, stratégie, recherche assistée, page équipe, import consenti, CRM réseau | ✅ Moteur testé / 🟡 parcours complet | Non testé contre Supabase réel |
 | Messages contrôlés, diagnostic des silences, 3 actions par jour, statistiques | ✅ Logique testée / 🟡 parcours complet | IA simulée ; non testé contre Supabase réel |
-| Coach d'entretien | ⬜ | Reporté en phase 7 | Affichent clairement « en construction » avec leur contenu prévu |
+| Forfaits Stripe (30 jours, paiement unique), webhook, remboursements | ✅ Testé hors ligne / 🟡 paiement réel | Session Stripe non testée sans clés |
+| Administration (agrégats, prix et quotas, fonctionnalités, journal) | ✅ Logique SQL testée | |
+| Coach d'entretien (Premium) | ✅ Logique testée | Simulation avec retours IA à venir | Affichent clairement « en construction » avec leur contenu prévu |
 
 Reporté après le MVP : coach d'entretien vocal, découverte intégrée de contacts (fournisseurs sous contrat), Relance Campus, Relance Employer.
 
 ## IA
 
 Sans `ANTHROPIC_API_KEY`, Relance fonctionne avec son analyseur déterministe. Avec une clé, l'extraction passe par le modèle configuré (`AI_MODEL`) en sortie JSON contrainte par schéma ; le résultat est ensuite ancré dans le texte du CV, puis vérifié par l'utilisateur. Renseigner `AI_PRICE_*` d'après la grille tarifaire en vigueur pour l'estimation des coûts.
+
+## Stripe
+
+1. Clés de test : `STRIPE_SECRET_KEY` (`sk_test_…`).
+2. Webhook : `Developers › Webhooks`, URL `<site>/api/stripe/webhook`, évènements `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `charge.refunded`. Copier le secret (`whsec_…`) dans `STRIPE_WEBHOOK_SECRET`.
+3. En local : `stripe listen --forward-to localhost:3000/api/stripe/webhook`.
+4. `SUPABASE_SECRET_KEY` est requis : le webhook attribue les forfaits avec le service role.
+5. Les prix sont ceux de la table `plans` (modifiables dans `/admin`) ; aucun produit Stripe à créer.
+
+## Administration
+
+Accès réservé aux comptes dont `user_profiles.is_admin = true`, à positionner manuellement en SQL (aucune interface ne permet de s'auto-promouvoir) :
+
+```sql
+update public.user_profiles set is_admin = true where id = '<uuid du compte>';
+```
 
 ## Prérequis
 

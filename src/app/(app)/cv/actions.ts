@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { FormState } from "@/lib/validation/auth";
 import { resumeProfileSchema, USER_EVIDENCE } from "@/lib/validation/resume-profile";
-import { getLlmProvider } from "@/server/ai/provider";
+import { aiProvider } from "@/server/flags";
 import { logAiUsage } from "@/server/ai/usage";
 import { ExtractionError, extractResumeText, MAX_RESUME_BYTES } from "@/server/cv/extract-text";
 import { parseResume } from "@/server/cv/parse-resume";
@@ -54,7 +54,7 @@ export async function uploadResume(_prev: FormState, formData: FormData): Promis
     throw e;
   }
 
-  const outcome = await parseResume(extracted.text, getLlmProvider());
+  const outcome = await parseResume(extracted.text, await aiProvider(supabase));
   if (outcome.ai) {
     await logAiUsage({ userId: user.id, feature: "resume_parse", ...outcome.ai });
   }

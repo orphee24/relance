@@ -11,6 +11,8 @@ const schema = z.object({
   /** Tarifs en euros par million de jetons, pour l'estimation des coûts (à renseigner d'après la grille du fournisseur). */
   AI_PRICE_INPUT_EUR_PER_MTOK: z.coerce.number().min(0).default(0),
   AI_PRICE_OUTPUT_EUR_PER_MTOK: z.coerce.number().min(0).default(0),
+  STRIPE_SECRET_KEY: z.string().regex(/^(sk|rk)_(test|live)_/, { error: "Clé Stripe invalide" }).optional(),
+  STRIPE_WEBHOOK_SECRET: z.string().regex(/^whsec_/, { error: "Secret de webhook Stripe invalide" }).optional(),
 });
 
 let cached: z.infer<typeof schema> | null = null;

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Download } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
@@ -43,7 +44,9 @@ export default async function SettingsPage() {
           <PanelHeader title="Forfait" description="Les forfaits payants durent 30 jours et ne sont jamais renouvelés automatiquement." />
           <PanelBody className="text-sm">
             <Row label="Forfait actuel">{planDef.name}</Row>
-            <p className="mt-3 text-muted">L&apos;achat d&apos;un forfait sera disponible en phase 7.</p>
+            <Link href="/parametres/forfait" className="mt-3 inline-block font-medium text-emerald hover:underline">
+              Voir mon forfait, ma consommation et mes paiements
+            </Link>
           </PanelBody>
         </Panel>
 

@@ -13,6 +13,7 @@ import {
 } from "@/lib/validation/network";
 import { classifyRole, relevanceInputs, sameCompany, strategyForRole, type RoleType } from "@/server/network/engine";
 import { applicationFacts } from "@/server/network/load";
+import { isEnabled } from "@/server/flags";
 import { computeRelevance } from "@/server/network/relevance";
 import { extractPeopleFromText, parseContactsCsv, type PersonCandidate } from "@/server/network/sources";
 
@@ -204,6 +205,7 @@ export async function importContacts(_prev: ImportState, fd: FormData): Promise<
   if (parsed.rows.length === 0) return { status: "error", fieldErrors: { file: "Aucun contact lisible dans ce fichier." } };
 
   const { supabase } = await requireUser();
+  if (!(await isEnabled(supabase, "contact_import"))) return { status: "error", message: "L'import de contacts est momentanément désactivé." };
   const { data: quotaEvent, error: quotaError } = await supabase.rpc("consume_quota", { p_feature: "network_search" });
   if (quotaError) return { status: "error", message: "Le service est momentanément indisponible." };
   if (!quotaEvent) return { status: "error", message: "Vous avez utilisé toutes vos recherches réseau du jour. Réessayez demain." };
@@ -238,7 +240,8 @@ export async function extractTeamPage(_prev: ExtractState, fd: FormData): Promis
   if (text.length > 50_000) errors.text = "Texte trop long (50 000 caractères maximum).";
   if (!/^https:\/\/\S+$/i.test(sourceUrl)) errors.source_url = "Indiquez l'adresse de la page officielle (https://…).";
   if (Object.keys(errors).length) return { status: "error", fieldErrors: errors, values: { text, source_url: sourceUrl } };
-  await requireUser();
+  const { supabase } = await requireUser();
+  if (!(await isEnabled(supabase, "team_page_extraction"))) return { status: "error", message: "Cette fonctionnalité est momentanément désactivée.", values: { text, source_url: sourceUrl } };
   const candidates = extractPeopleFromText(text, 60);
   if (candidates.length === 0) {
     return { status: "error", message: "Aucun nom de personne n'a été reconnu dans ce texte.", values: { text, source_url: sourceUrl } };

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { LogOut, Menu, X } from "lucide-react";
+import { LogOut, Menu, ShieldCheck, X } from "lucide-react";
 import { NAV_ITEMS } from "@/config/navigation";
 import { Logo } from "@/components/brand";
 import { ThemeToggle } from "./theme-toggle";
@@ -14,13 +14,15 @@ interface SidebarProps {
   displayName: string;
   email: string;
   planLabel: string;
+  isAdmin?: boolean;
 }
 
-function NavList({ onNavigate }: { onNavigate?: () => void }) {
+function NavList({ onNavigate, isAdmin }: { onNavigate?: () => void; isAdmin?: boolean }) {
   const pathname = usePathname();
+  const items = isAdmin ? [...NAV_ITEMS, { href: "/admin", label: "Administration", icon: ShieldCheck, phase: 7 }] : NAV_ITEMS;
   return (
     <ul className="grid gap-0.5">
-      {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
+      {items.map(({ href, label, icon: Icon }) => {
         const active = pathname === href || pathname.startsWith(`${href}/`);
         return (
           <li key={href}>
@@ -49,7 +51,9 @@ function AccountBlock({ displayName, email, planLabel }: SidebarProps) {
     <div className="grid gap-3 border-t border-line pt-4">
       <div className="flex items-center justify-between gap-2">
         <ThemeToggle />
-        <span className="rounded-full bg-sunken px-2 py-0.5 text-xs font-medium text-muted">{planLabel}</span>
+        <Link href="/parametres/forfait" className="rounded-full bg-sunken px-2 py-0.5 text-xs font-medium text-muted hover:text-ink">
+          {planLabel}
+        </Link>
       </div>
       <div className="flex items-center gap-3">
         <span
@@ -126,7 +130,7 @@ export function Sidebar(props: SidebarProps) {
               </button>
             </div>
             <div className="flex-1">
-              <NavList onNavigate={() => setOpen(false)} />
+              <NavList onNavigate={() => setOpen(false)} isAdmin={props.isAdmin} />
             </div>
             <AccountBlock {...props} />
           </nav>
@@ -140,7 +144,7 @@ export function Sidebar(props: SidebarProps) {
       >
         <Logo href="/tableau-de-bord" className="px-3" />
         <div className="flex-1">
-          <NavList />
+          <NavList isAdmin={props.isAdmin} />
         </div>
         <AccountBlock {...props} />
       </nav>

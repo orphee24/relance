@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
-import { getLlmProvider } from "@/server/ai/provider";
+import { aiProvider } from "@/server/flags";
 import { logAiUsage } from "@/server/ai/usage";
 import { checkMessage, hasBlockingIssue, type CheckIssue } from "@/server/messages/checks";
 import { generateMessage } from "@/server/messages/generate";
@@ -62,7 +62,7 @@ export async function generateDraft(_prev: DraftState, fd: FormData): Promise<Dr
   }
 
   // L'IA est réservée au quota « relances IA » du forfait ; au-delà, le modèle sans IA est utilisé.
-  let provider = getLlmProvider();
+  let provider = await aiProvider(supabase);
   let note: string | undefined;
   let quotaEvent: string | null = null;
   if (provider) {

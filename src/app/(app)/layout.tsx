@@ -12,9 +12,10 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   } = await supabase.auth.getUser();
   if (!user) redirect("/connexion");
 
-  const [{ data: profile }, { data: plan }] = await Promise.all([
+  const [{ data: profile }, { data: plan }, { data: isAdmin }] = await Promise.all([
     supabase.from("user_profiles").select("first_name, last_name").eq("id", user.id).maybeSingle(),
     supabase.rpc("current_plan"),
+    supabase.rpc("is_admin"),
   ]);
 
   const displayName =
@@ -23,7 +24,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="lg:flex">
-      <Sidebar displayName={displayName} email={user.email ?? ""} planLabel={DEFAULT_PLANS[planCode].name} />
+      <Sidebar displayName={displayName} email={user.email ?? ""} planLabel={DEFAULT_PLANS[planCode].name} isAdmin={isAdmin === true} />
       <main id="contenu" className="min-w-0 flex-1 px-4 py-6 sm:px-8 lg:py-10">
         <div className="mx-auto max-w-6xl">{children}</div>
       </main>

@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 import { firstErrors, type FormState } from "@/lib/validation/auth";
 import { analyzeOfferFormSchema, storedAnalysisSchema, type StoredAnalysis } from "@/lib/validation/offer";
 import { resumeProfileSchema } from "@/lib/validation/resume-profile";
-import { getLlmProvider } from "@/server/ai/provider";
+import { aiProvider } from "@/server/flags";
 import { logAiUsage } from "@/server/ai/usage";
 import { analyzeOffer, type AiCall } from "@/server/offers/analyze";
 import { companyDomainFromOfferUrl } from "@/server/offers/company";
@@ -73,7 +73,7 @@ export async function analyzeOfferAction(_prev: FormState, formData: FormData): 
       offerText: form.description,
       overrides: { title: form.title, company: form.company, location: form.location },
       resume: resume ? { versionId: resume.versionId, label: resume.label, profile: resume.profile } : null,
-      provider: getLlmProvider(),
+      provider: await aiProvider(supabase),
     });
     await logCalls(user.id, aiCalls);
 
@@ -226,7 +226,7 @@ export async function createAdaptedVersion(formData: FormData) {
     offerText: loaded.offer.description,
     overrides: { title: loaded.analysis.metadata.title, company: loaded.analysis.metadata.company, location: loaded.analysis.metadata.location },
     resume: { versionId: newVersion?.id ?? version.versionId, label: `${version.label.split(" — ")[0]} — Adaptée — ${loaded.offer.company_name}`, profile },
-    provider: getLlmProvider(),
+    provider: await aiProvider(supabase),
   });
   await logCalls(user.id, aiCalls);
   await supabase

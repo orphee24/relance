@@ -119,10 +119,22 @@ Légende : ✅ fait et vérifié · 🟡 partiel / simulé · ⬜ à faire
 - Délais : première relance à J+7, seconde 7 jours après, aucune au-delà ; « faire le point » proposé à J+45 après 2 relances.
 - Le coach d'entretien (module 7) est reporté à la phase 7.
 
-## Phase 7 — Paiements, quotas, administration
-- ⬜ Stripe Checkout (paiement unique 30 jours), webhooks, historique
-- ⬜ Droits et quotas côté serveur
-- ⬜ Espace admin (agrégats uniquement), feature flags
+## Phase 7 — Paiements, quotas, administration, coach d'entretien
+- ✅ Forfaits 30 jours en paiement unique (Stripe Checkout, mode « payment ») : montant issu de la table `plans`, aucun renouvellement automatique
+- ✅ Renonciation au droit de rétractation recueillie (case obligatoire) et horodatée avec le paiement
+- ✅ Webhook signé (corps brut), idempotent par évènement et par session : attribution du forfait, prolongation si même forfait, paiements différés, remboursements (total = fin d'accès, partiel = accès conservé)
+- ✅ Attribution et remboursement exécutables uniquement par le service role ; aucun utilisateur ne peut s'attribuer un forfait
+- ✅ Page « Mon forfait » : forfait et date de fin, consommation des quotas, comparaison des forfaits, historique et reçus
+- ✅ Administration (réservée à `is_admin`) : indicateurs agrégés sans donnée personnelle, coût IA par fonctionnalité, édition des prix et quotas, fonctionnalités activables, journal des actions
+- ✅ Fonctionnalités activables appliquées : IA, import de contacts, extraction de page équipe, coach d'entretien, achat
+- ✅ Coach d'entretien (Premium) : questions probables tirées de l'offre, réponses STAR à partir du CV vérifié, critères non démontrés abordés honnêtement, questions à poser, repères salariaux
+- 🟡 Paiement Stripe de bout en bout : signature, webhook et logique testés hors ligne ; **création réelle de session non testée** (pas de clés)
+- ✅ Tests : 165 unitaires, 74 E2E, 7 suites SQL
+
+### Décisions à valider
+- Un nouvel achat du forfait en cours démarre à la fin de la période en cours ; un forfait différent démarre immédiatement (le plus élevé s'applique).
+- Remboursement partiel : accès conservé ; total : accès retiré.
+- Mentions de renonciation au droit de rétractation à faire valider juridiquement (avec les CGV).
 
 ## Phase 8 — Tests, sécurité, déploiement
 - ⬜ E2E Playwright des parcours critiques
