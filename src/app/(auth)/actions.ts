@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { isGoogleAuthEnabled, publicEnv } from "@/lib/env";
 import { safeRedirectPath } from "@/lib/utils";
+import { allow, clientIp, RATE_LIMIT_MESSAGE, RATE_RULES } from "@/server/rate-limit";
 import {
   firstErrors,
   forgotPasswordSchema,
@@ -48,6 +49,7 @@ export async function signUp(_prev: FormState, formData: FormData): Promise<Form
   if (!parsed.success) return { status: "error", fieldErrors: firstErrors(parsed.error), values };
 
   const { firstName, lastName, email, password } = parsed.data;
+  if (!(await allow(RATE_RULES.signUpIp, await clientIp()))) return { status: "error", message: RATE_LIMIT_MESSAGE, values };
   const supabase = await createClient();
   const { data, error } = await supabase.auth.signUp({
     email,
@@ -78,6 +80,12 @@ export async function signIn(_prev: FormState, formData: FormData): Promise<Form
   const parsed = signInSchema.safeParse(raw);
   if (!parsed.success) return { status: "error", fieldErrors: firstErrors(parsed.error), values };
 
+  const [ipOk, emailOk] = await Promise.all([
+    allow(RATE_RULES.signInIp, await clientIp()),
+    allow(RATE_RULES.signInEmail, parsed.data.email),
+  ]);
+  if (!ipOk || !emailOk) return { status: "error", message: RATE_LIMIT_MESSAGE, values };
+
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword(parsed.data);
   if (error) return { status: "error", message: mapAuthError(error.code, error.status), values };
@@ -101,6 +109,7 @@ export async function requestPasswordReset(_prev: FormState, formData: FormData)
   const raw = Object.fromEntries(formData) as Record<string, string>;
   const parsed = forgotPasswordSchema.safeParse(raw);
   if (!parsed.success) return { status: "error", fieldErrors: firstErrors(parsed.error), values: { email: raw.email ?? "" } };
+  if (!(await allow(RATE_RULES.emailIp, await clientIp()))) return { status: "error", message: RATE_LIMIT_MESSAGE };
 
   const supabase = await createClient();
   const { error } = await supabase.auth.resetPasswordForEmail(parsed.data.email, {
@@ -133,6 +142,7 @@ export async function updatePassword(_prev: FormState, formData: FormData): Prom
 export async function resendVerification(_prev: FormState, formData: FormData): Promise<FormState> {
   const parsed = forgotPasswordSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) return { status: "error", fieldErrors: firstErrors(parsed.error) };
+  if (!(await allow(RATE_RULES.emailIp, await clientIp()))) return { status: "error", message: RATE_LIMIT_MESSAGE };
 
   const supabase = await createClient();
   const { error } = await supabase.auth.resend({

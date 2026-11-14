@@ -62,7 +62,7 @@ export async function generateDraft(_prev: DraftState, fd: FormData): Promise<Dr
   }
 
   // L'IA est réservée au quota « relances IA » du forfait ; au-delà, le modèle sans IA est utilisé.
-  let provider = await aiProvider(supabase);
+  let provider = await aiProvider(supabase, user.id);
   let note: string | undefined;
   let quotaEvent: string | null = null;
   if (provider) {

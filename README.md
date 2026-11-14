@@ -6,31 +6,22 @@ Copilote de recherche d'emploi : analyse CV/offre, CRM de candidatures et **Netw
 
 Spécifications : [`docs/`](docs) — [Produit](docs/PRODUCT.md) · [Architecture](docs/ARCHITECTURE.md) · [Base de données](docs/DATABASE.md) · [Moteur réseau](docs/NETWORK_ENGINE.md) · [Sécurité & RGPD](docs/SECURITY.md) · [Roadmap](docs/ROADMAP.md)
 
-## État actuel — fin de la phase 7
+## État actuel — fin de la phase 8
+
+Projet Supabase de recette : `relance` (eu-central-1), 12 migrations appliquées, conseiller de sécurité revu.
 
 | Fonctionnalité | État | Détail |
 |---|---|---|
-| Schéma de base complet (30 tables), RLS, migrations | ✅ Vérifié | Appliqué sur Postgres 16 + pgvector ; 30+ assertions d'isolation et d'intégrité (`npm run test:db`) |
-| Design system (thème émeraude, mode sombre, marqueurs de fiabilité) | ✅ Vérifié | Revu en capture clair/sombre, desktop/mobile |
-| Shell applicatif, navigation latérale, responsive | ✅ Vérifié | |
-| Validation des formulaires d'authentification, protection des routes, redirections sûres | ✅ Vérifié | Tests E2E Playwright (desktop + mobile) |
-| Inscription, connexion, vérification email, mot de passe oublié/réinitialisation, déconnexion | 🟡 Code complet | **Non testé contre un vrai projet Supabase** (aucun projet configuré pour l'instant) |
-| Connexion Google | 🟡 Code complet | Désactivée tant que `NEXT_PUBLIC_GOOGLE_AUTH_ENABLED=false` |
-| Tableau de bord (métriques, pipeline, opportunités, rappels) | 🟡 Branché sur les vraies tables | Se remplira à partir de la phase 4 ; aucune donnée fictive affichée |
-| Export RGPD (JSON) | 🟡 Code complet | Fonction SQL testée ; route non testée contre Supabase réel |
-| Demande de suppression de compte | 🟡 Enregistrée | **Le traitement automatique (job) est prévu en phase 8** ; d'ici là, traitement manuel par l'opérateur |
-| Moteurs déterministes : couverture CV/offre, pertinence des contacts, métriques | ✅ Testés unitairement | Seront branchés en phases 3, 5 et 6 |
-| Onboarding en 5 étapes | 🟡 Code complet | Validation testée ; enregistrement non testé contre Supabase réel |
-| Import CV PDF/DOCX, extraction, analyse sans IA, ancrage, anti-injection, PDF | ✅ Testés | Sur fichiers générés (`tests/fixtures`, données fictives) |
-| Extraction des CV par IA | 🟡 Adaptateur testé avec réponses simulées | Activé par `ANTHROPIC_API_KEY` ; jamais appelé réellement |
-| Vérification du profil, versions, CV principal, export PDF | 🟡 Logique SQL et rendu PDF testés | Parcours complet non testé contre Supabase réel |
-| Analyse d'offre : critères, score de couverture expliqué, suggestions, version adaptée | ✅ Moteur testé / 🟡 parcours complet | Logique et quotas testés ; enregistrement non testé contre Supabase réel ; IA simulée |
-| Suivi des candidatures : liste, Kanban, historique, notes, rappels, doublons, exports CSV et agenda | ✅ Logique testée / 🟡 parcours complet | Non testé contre Supabase réel |
-| Réseau niveau 1 : personnes à contacter, score expliqué, stratégie, recherche assistée, page équipe, import consenti, CRM réseau | ✅ Moteur testé / 🟡 parcours complet | Non testé contre Supabase réel |
-| Messages contrôlés, diagnostic des silences, 3 actions par jour, statistiques | ✅ Logique testée / 🟡 parcours complet | IA simulée ; non testé contre Supabase réel |
-| Forfaits Stripe (30 jours, paiement unique), webhook, remboursements | ✅ Testé hors ligne / 🟡 paiement réel | Session Stripe non testée sans clés |
-| Administration (agrégats, prix et quotas, fonctionnalités, journal) | ✅ Logique SQL testée | |
-| Coach d'entretien (Premium) | ✅ Logique testée | Simulation avec retours IA à venir | Affichent clairement « en construction » avec leur contenu prévu |
+| Schéma (32 tables), RLS, migrations | ✅ Appliqué sur Supabase réel | 8 suites SQL (`npm run test:db`) ; conseiller de sécurité : seules restent des alertes attendues (fonctions protégées par contrôle interne) |
+| Extraction et rédaction par IA (Anthropic) | ✅ Testé contre l'API réelle | `npm run test:live` : CV fictif extrait sans invention, consigne injectée ignorée |
+| Moteurs déterministes (couverture, pertinence, métriques, recommandations) | ✅ Testés | 170 tests unitaires |
+| Authentification, onboarding, CV, offres, candidatures, réseau, messages, forfaits, admin, coach | ✅ Logique testée / 🟡 parcours connecté | À valider de bout en bout sur le déploiement de recette (voir docs/DEPLOYMENT.md) |
+| Suppression de compte | ✅ Job quotidien | Fichiers, compte et données supprimés ; paiements conservés anonymisés ; annulable avant traitement ; audité |
+| Journal d'audit | ✅ | Exports, demandes/annulations/exécutions de suppression, forfaits, remboursements, réglages admin |
+| Limitation de débit | ✅ | Connexion (IP + email), inscription, emails, appels IA ; clés hachées, aucune IP stockée |
+| CSP avec nonce par requête | ✅ Vérifié en E2E | `script-src 'nonce-…' 'strict-dynamic'`, plus de `unsafe-inline` pour les scripts |
+| Suivi des erreurs (Sentry) | ✅ Optionnel | Serveur uniquement, événements nettoyés (corps, cookies, emails, secrets) |
+| Textes légaux (CGU, confidentialité) | ⬜ À rédiger | Pages provisoires ; validation juridique obligatoire avant ouverture |
 
 Reporté après le MVP : coach d'entretien vocal, découverte intégrée de contacts (fournisseurs sous contrat), Relance Campus, Relance Employer.
 
@@ -94,6 +85,7 @@ Sans configuration Supabase, l'application démarre et les pages protégées red
 | `npm run lint` | ESLint |
 | `npm test` | Tests unitaires (Vitest) |
 | `npm run test:db` | Migrations + suites SQL (RLS, workflow CV), une base jetable par suite (Postgres 15+ et pgvector requis) |
+| `npm run test:live` | Appel réel à l'API Anthropic sur un CV fictif (nécessite `ANTHROPIC_API_KEY`, quelques centimes) |
 | `npm run test:e2e` | Build de production + Playwright (`CHROME_PATH=/chemin/vers/chrome` si les navigateurs Playwright ne sont pas installés) |
 | `npm run check` | typecheck + lint + tests + build |
 
@@ -101,10 +93,7 @@ Les tests E2E utilisent par défaut une URL Supabase injoignable : ils couvrent 
 
 ## Déploiement
 
-1. Projet Supabase de production (UE), migrations appliquées, étapes 3 à 7 ci-dessus.
-2. Hébergement Next.js (Vercel région `cdg1`/`fra1`, ou conteneur Node) ; variables de `.env.example` renseignées, `NEXT_PUBLIC_SITE_URL` sur le domaine final.
-3. `npm run check` vert en CI avant chaque mise en production.
-4. Avant l'ouverture au public : CGU et politique de confidentialité validées juridiquement, AIPD du module réseau, SMTP dédié, Sentry, revue de sécurité (voir `docs/SECURITY.md` §6).
+Procédure complète (Vercel + Supabase + Stripe, variables, vérifications) : [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
 
 ## Structure
 

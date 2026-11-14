@@ -7,7 +7,7 @@ function matches(pathname: string, prefixes: string[]) {
   return prefixes.some((p) => pathname === p || pathname.startsWith(`${p}/`));
 }
 
-export async function updateSession(request: NextRequest) {
+export async function updateSession(request: NextRequest, requestHeaders: Headers = request.headers) {
   const { pathname } = request.nextUrl;
   const config = supabaseConfig();
 
@@ -19,10 +19,10 @@ export async function updateSession(request: NextRequest) {
       url.search = "";
       return NextResponse.redirect(url);
     }
-    return NextResponse.next({ request });
+    return NextResponse.next({ request: { headers: requestHeaders } });
   }
 
-  let response = NextResponse.next({ request });
+  let response = NextResponse.next({ request: { headers: requestHeaders } });
 
   const supabase = createServerClient(config.url, config.key, {
     cookies: {
@@ -31,7 +31,9 @@ export async function updateSession(request: NextRequest) {
       },
       setAll(cookiesToSet) {
         cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
-        response = NextResponse.next({ request });
+        // Les cookies rafraîchis doivent aussi être visibles des composants serveur.
+        requestHeaders.set("cookie", request.cookies.toString());
+        response = NextResponse.next({ request: { headers: requestHeaders } });
         cookiesToSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
       },
     },

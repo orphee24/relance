@@ -13,7 +13,8 @@
 | Fuite de secrets | Secrets uniquement en variables d'environnement ; `SUPABASE_SERVICE_ROLE_KEY` utilisée seulement dans `src/server` (`server-only`) ; `.env*` ignorés par git |
 | Brute force / spam | Rate limiting Supabase Auth + limiteur applicatif sur routes sensibles (IA, réseau, auth) |
 | Upload malveillant | Type déterminé par signature du fichier (jamais par l'extension ou le type déclaré), PDF/DOCX uniquement, ≤ 5 Mo, 10 imports/24 h et 20 CV max par compte, bucket privé, chemin `user_id/…`, URLs signées de 60 s |
-| XSS | Rendu React échappé ; aucun `dangerouslySetInnerHTML` sur contenu utilisateur ; en-têtes CSP |
+| XSS | Rendu React échappé ; aucun `dangerouslySetInnerHTML` sur contenu utilisateur ; CSP avec nonce par requête et `strict-dynamic` (middleware) |
+| Force brute, abus | Limitation de débit en base (`rate_limit_hit`, clés SHA-256) : connexion par IP et par email, inscription, emails, appels IA |
 
 ## 2. En-têtes HTTP
 
@@ -32,7 +33,7 @@ Définis dans `next.config.ts` : `Content-Security-Policy`, `X-Frame-Options: DE
 | Minimisation | Fiches de tiers limitées aux données professionnelles ; jamais de téléphone personnel ni d'email privé sans base légale |
 | Information des tiers | Les tiers ne sont pas contactés par Relance ; l'utilisateur reste l'émetteur. Mention dans la politique de confidentialité |
 | Droit d'accès / portabilité | Export JSON complet depuis Paramètres → Données |
-| Droit à l'effacement | `deletion_requests` → suppression en cascade sous 30 jours max (immédiate pour les données applicatives, purge des sauvegardes selon le cycle de l'hébergeur) |
+| Droit à l'effacement | `deletion_requests` → job quotidien (`/api/jobs/daily`) : fichiers du stockage, compte d'authentification, cascade sur toutes les données ; paiements conservés avec `user_id` nul (obligations comptables) ; annulable avant traitement ; audité. Purge des sauvegardes selon le cycle de l'hébergeur |
 | Consentements | `consent_records` horodatés et versionnés (CGU, confidentialité, import de contacts, emails) |
 | Rétention | CV et candidatures : durée du compte ; contacts tiers non rattachés : 12 mois ; logs d'audit : 12 mois ; données de paiement : obligations comptables (10 ans pour les pièces, hors données de carte jamais stockées) |
 | Sous-traitants | Supabase (région UE), fournisseur LLM (DPA, pas d'entraînement sur les données), Stripe, Resend, Sentry (UE) |

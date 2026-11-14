@@ -8,6 +8,7 @@ import { Alert } from "@/components/ui/misc";
 import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
 import { DEFAULT_PLANS, type PlanCode } from "@/config/plans";
 import { createClient } from "@/lib/supabase/server";
+import { cancelAccountDeletion } from "./actions";
 import { DeletionForm } from "./deletion-form";
 
 export const metadata: Metadata = { title: "Paramètres" };
@@ -21,7 +22,7 @@ export default async function SettingsPage() {
   } = await supabase.auth.getUser();
   const [{ data: plan }, { data: pending }] = await Promise.all([
     supabase.rpc("current_plan"),
-    supabase.from("deletion_requests").select("requested_at").in("status", ["pending", "processing"]).maybeSingle(),
+    supabase.from("deletion_requests").select("requested_at, status").in("status", ["pending", "processing"]).maybeSingle(),
   ]);
   const planDef = DEFAULT_PLANS[(typeof plan === "string" && plan in DEFAULT_PLANS ? plan : "free") as PlanCode];
 
@@ -71,9 +72,19 @@ export default async function SettingsPage() {
                 paiement sont conservés de façon anonymisée pour nos obligations comptables.
               </p>
               {pending ? (
-                <Alert tone="info" title="Demande de suppression enregistrée">
-                  Demande reçue le {dateFmt.format(new Date(pending.requested_at))}.
-                </Alert>
+                <div className="grid gap-3">
+                  <Alert tone="info" title="Demande de suppression enregistrée">
+                    Demande reçue le {dateFmt.format(new Date(pending.requested_at))}. Votre compte sera supprimé lors du
+                    traitement quotidien, dans les 24 heures.
+                  </Alert>
+                  {pending.status === "pending" ? (
+                    <form action={cancelAccountDeletion}>
+                      <Button type="submit" variant="secondary">
+                        Annuler la demande
+                      </Button>
+                    </form>
+                  ) : null}
+                </div>
               ) : (
                 <DeletionForm />
               )}

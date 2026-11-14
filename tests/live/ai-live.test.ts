@@ -27,7 +27,7 @@ describe("IA réelle", () => {
     const { parse, ai } = await parseResume(CV, provider);
     console.log(JSON.stringify({ ms: Date.now() - t0, ai, source: parse.source,
       skills: parse.profile.skills?.map((s: { name: string }) => s.name),
-      experiences: parse.profile.experiences?.length, rejected: (parse as any).rejectedCount ?? (parse as any).rejected }, null, 1));
+      experiences: parse.profile.experiences?.length }, null, 1));
     expect(ai?.success).toBe(true);
     const names = (parse.profile.skills ?? []).map((s: { name: string }) => s.name.toLowerCase());
     expect(names).not.toContain("python");

@@ -19,5 +19,14 @@ export async function requestAccountDeletion(_prev: FormState, formData: FormDat
     return { status: "error", message: "La demande n'a pas pu être enregistrée. Réessayez." };
   }
   revalidatePath("/parametres");
-  return { status: "success", message: "Votre demande de suppression est enregistrée." };
+  return {
+    status: "success",
+    message: "Votre demande est enregistrée. La suppression est effectuée lors du traitement quotidien, dans les 24 heures. Vous pouvez l'annuler d'ici là.",
+  };
+}
+
+export async function cancelAccountDeletion() {
+  const supabase = await createClient();
+  await supabase.rpc("cancel_my_deletion_request");
+  revalidatePath("/parametres");
 }

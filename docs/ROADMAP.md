@@ -137,11 +137,17 @@ Légende : ✅ fait et vérifié · 🟡 partiel / simulé · ⬜ à faire
 - Mentions de renonciation au droit de rétractation à faire valider juridiquement (avec les CGV).
 
 ## Phase 8 — Tests, sécurité, déploiement
-- ⬜ E2E Playwright des parcours critiques
-- ⬜ Job de traitement des demandes de suppression (auth, fichiers, anonymisation des paiements)
-- ⬜ Journal d'audit des exports et suppressions
-- ⬜ Rate limiting, CSP finalisée, Sentry
-- ⬜ Procédure de déploiement
+- ✅ Projet Supabase de recette (eu-central-1) : 12 migrations appliquées, conseillers sécurité et performance revus (durcissement + index des clés étrangères)
+- ✅ IA testée contre l'API Anthropic réelle (`npm run test:live`)
+- ✅ Job quotidien `/api/jobs/daily` (Vercel Cron, `CRON_SECRET`) : suppressions de comptes (fichiers, compte, cascade, paiements anonymisés), expiration des forfaits, purge des fiches de tiers, nettoyage
+- ✅ Suppression annulable tant qu'elle n'est pas traitée ; reprise automatique d'un traitement interrompu
+- ✅ Journal d'audit : exports, demandes, annulations et exécutions de suppression
+- ✅ Limitation de débit en base (clés hachées) : connexion, inscription, emails, IA (repli sur les moteurs déterministes)
+- ✅ CSP avec nonce par requête et `strict-dynamic` — vérifiée en E2E (hydratation sans violation)
+- ✅ Sentry côté serveur, optionnel, événements nettoyés
+- ✅ Procédure de déploiement (`docs/DEPLOYMENT.md`)
+- 🟡 E2E des parcours connectés contre les vrais services : à exécuter sur le déploiement de recette
+- ⬜ Textes légaux définitifs, AIPD du module réseau, SMTP dédié (prérequis à l'ouverture publique)
 
 ## Après MVP
 - Coach d'entretien avancé (voix)

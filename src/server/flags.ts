@@ -1,6 +1,7 @@
 import "server-only";
 import type { createClient } from "@/lib/supabase/server";
 import { getLlmProvider, type LlmProvider } from "@/server/ai/provider";
+import { allow, RATE_RULES } from "@/server/rate-limit";
 
 type Supabase = Awaited<ReturnType<typeof createClient>>;
 
@@ -11,9 +12,13 @@ export async function isEnabled(supabase: Supabase, key: FeatureFlag): Promise<b
   return !error && data === true;
 }
 
-/** Fournisseur IA si une clé est configurée ET la fonctionnalité activée par l'administration. */
-export async function aiProvider(supabase: Supabase): Promise<LlmProvider | null> {
+/**
+ * Fournisseur IA si une clé est configurée, la fonctionnalité activée par l'administration
+ * et l'utilisateur sous la limite de débit. Sinon null : les moteurs déterministes prennent le relais.
+ */
+export async function aiProvider(supabase: Supabase, userId: string): Promise<LlmProvider | null> {
   const provider = getLlmProvider();
   if (!provider) return null;
-  return (await isEnabled(supabase, "ai_generation")) ? provider : null;
+  if (!(await isEnabled(supabase, "ai_generation"))) return null;
+  return (await allow(RATE_RULES.aiUser, userId)) ? provider : null;
 }

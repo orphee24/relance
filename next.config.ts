@@ -1,29 +1,8 @@
 import type { NextConfig } from "next";
 
 const isProd = process.env.NODE_ENV === "production";
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
-const supabaseOrigin = supabaseUrl ? new URL(supabaseUrl).origin : "";
-const supabaseWs = supabaseOrigin.replace(/^http/, "ws");
-
-const csp = [
-  "default-src 'self'",
-  // Next.js injecte des scripts inline d'hydratation ; nonce à introduire en phase 8.
-  `script-src 'self' 'unsafe-inline'${isProd ? "" : " 'unsafe-eval'"}`,
-  "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob:",
-  "font-src 'self'",
-  `connect-src 'self' ${supabaseOrigin} ${supabaseWs}`.trim(),
-  "frame-ancestors 'none'",
-  "base-uri 'self'",
-  "form-action 'self' https://accounts.google.com " + supabaseOrigin,
-  "object-src 'none'",
-  isProd ? "upgrade-insecure-requests" : "",
-]
-  .filter(Boolean)
-  .join("; ");
-
+// La CSP (avec nonce par requête) est posée par le middleware : src/lib/security/csp.ts
 const securityHeaders = [
-  { key: "Content-Security-Policy", value: csp },
   { key: "X-Frame-Options", value: "DENY" },
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },

@@ -54,7 +54,7 @@ export async function uploadResume(_prev: FormState, formData: FormData): Promis
     throw e;
   }
 
-  const outcome = await parseResume(extracted.text, await aiProvider(supabase));
+  const outcome = await parseResume(extracted.text, await aiProvider(supabase, user.id));
   if (outcome.ai) {
     await logAiUsage({ userId: user.id, feature: "resume_parse", ...outcome.ai });
   }
